@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Event Account 2026</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;
+    font-family:'Segoe UI',system-ui,sans-serif;color:#fff;
+    background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);}
+  .card{width:100%;max-width:440px;background:rgba(255,255,255,.07);backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:30px 26px;
+    box-shadow:0 20px 60px rgba(0,0,0,.45);}
+  h1{text-align:center;font-size:26px;letter-spacing:1px}
+  h1 span{color:#ff4d8d}
+  .sub{text-align:center;opacity:.75;font-size:14px;margin:6px 0 22px}
+  .slots{display:flex;justify-content:center;gap:8px;margin-bottom:22px}
+  .slot{width:34px;height:34px;border-radius:50%;border:2px solid #ff4d8d;display:flex;
+    align-items:center;justify-content:center;font-size:13px;font-weight:700}
+  .slot.taken{background:#ff4d8d;color:#fff}
+  label{display:block;font-size:13px;margin:14px 0 6px;opacity:.85}
+  input,select{width:100%;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.25);
+    background:rgba(0,0,0,.35);color:#fff;font-size:15px;outline:none}
+  select option{color:#000}
+  input:focus,select:focus{border-color:#ff4d8d}
+  button{width:100%;margin-top:22px;padding:13px;border:0;border-radius:10px;cursor:pointer;
+    font-size:16px;font-weight:700;color:#fff;background:linear-gradient(90deg,#ff4d8d,#ff8a4d)}
+  button:active{transform:scale(.98)}
+  .result{display:none;text-align:center}
+  .result h2{font-size:20px;line-height:1.5;margin:10px 0 14px}
+  .result p{opacity:.85;font-size:14px;line-height:1.6}
+  .ok h2{color:#5dffa0}
+  .err h2{color:#ff5d5d;font-size:34px}
+  .no h2{color:#ffd45d}
+  .back{background:rgba(255,255,255,.15);margin-top:20px}
+  .emoji{font-size:54px}
+</style>
+</head>
+<body>
+<div class="card">
+
+  <!-- FORM -->
+  <div id="formView">
+    <h1>🎁 EVENT <span>ACCOUNT</span> 2026</h1>
+    <p class="sub">Isi nama dan grup kamu untuk ikut event!</p>
+    <div class="slots" id="slots"></div>
+
+    <label for="nama">Nama</label>
+    <input id="nama" type="text" placeholder="Masukkan nama kamu" maxlength="40" autocomplete="off">
+
+    <label for="grup">Grup</label>
+    <select id="grup">
+      <option value="">-- Pilih grup --</option>
+      <option>Pemain Roblox Teams Entertainment &amp; VD Group</option>
+      <option>Minecraft Community</option>
+      <option>Computer Community</option>
+      <option>Grup lainnya</option>
+    </select>
+
+    <button id="btn">KLAIM SEKARANG</button>
+  </div>
+
+  <!-- HASIL: MENANG -->
+  <div id="okView" class="result ok">
+    <div class="emoji">🎉</div>
+    <h2>SELAMAT ANDA TELAH BERHASIL DAN ANDA TELAH DAPAT AKUN TIKTOK BARU AKAN MENERIMA EMAIL TAPI HARAP CHAT OWNER GRUP DAN KASIH TAU EMAIL ANDA</h2>
+    <p id="okName"></p>
+    <button class="back" onclick="showForm()">Kembali</button>
+  </div>
+
+  <!-- HASIL: HABIS -->
+  <div id="errView" class="result err">
+    <div class="emoji">❌</div>
+    <h2>EROR 404</h2>
+    <p style="font-size:16px;font-weight:600;color:#fff">Anda sudah kehabisan, orang lain sudah meng-claim nya.</p>
+    <button class="back" onclick="showForm()">Kembali</button>
+  </div>
+
+  <!-- HASIL: GRUP TIDAK IKUT -->
+  <div id="noView" class="result no">
+    <div class="emoji">🚫</div>
+    <h2>Maaf, grup kamu tidak termasuk dalam event ini.</h2>
+    <p>Event hanya untuk member Roblox Teams Entertainment &amp; VD Group, Minecraft Community, dan Computer Community.</p>
+    <button class="back" onclick="showForm()">Kembali</button>
+  </div>
+
+</div>
+
+<script>
+  const MAX_WINNERS = 3;
+  const KEY = 'event_account_2026_winners';
+  const ELIGIBLE = [
+    'Pemain Roblox Teams Entertainment & VD Group',
+    'Minecraft Community',
+    'Computer Community'
+  ];
+
+  function getWinners(){
+    try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch(e){ return window._w || []; }
+  }
+  function setWinners(list){
+    try { localStorage.setItem(KEY, JSON.stringify(list)); } catch(e){ window._w = list; }
+  }
+
+  function renderSlots(){
+    const w = getWinners().length;
+    let html = '';
+    for(let i=0;i<MAX_WINNERS;i++){
+      html += `<div class="slot ${i<w?'taken':''}">${i<w?'✓':i+1}</div>`;
+    }
+    document.getElementById('slots').innerHTML = html;
+  }
+
+  const views = ['formView','okView','errView','noView'];
+  function show(id){
+    views.forEach(v => document.getElementById(v).style.display = (v===id ? 'block':'none'));
+  }
+  function showForm(){
+    document.getElementById('nama').value='';
+    document.getElementById('grup').value='';
+    renderSlots();
+    show('formView');
+  }
+
+  document.getElementById('btn').addEventListener('click', () => {
+    const nama = document.getElementById('nama').value.trim();
+    const grup = document.getElementById('grup').value;
+
+    if(!nama){ alert('Nama harus diisi!'); return; }
+    if(!grup){ alert('Pilih grup dulu!'); return; }
+
+    if(!ELIGIBLE.includes(grup)){ show('noView'); return; }
+
+    const winners = getWinners();
+
+    // sudah penuh -> ERROR 404
+    if(winners.length >= MAX_WINNERS){ show('errView'); return; }
+
+    // nama yang sama tidak bisa klaim 2x
+    if(winners.some(x => x.nama.toLowerCase() === nama.toLowerCase())){
+      alert('Nama ini sudah pernah klaim!'); return;
+    }
+
+    winners.push({nama, grup, waktu: new Date().toISOString()});
+    setWinners(winners);
+    document.getElementById('okName').textContent = `Selamat, ${nama} (${grup})! Kamu pemenang ke-${winners.length} dari ${MAX_WINNERS}.`;
+    show('okView');
+  });
+
+  // Reset (khusus owner): buka file dengan #reset di akhir URL
+  if(location.hash === '#reset'){
+    try { localStorage.removeItem(KEY); } catch(e){}
+    window._w = [];
+  }
+
+  showForm();
+</script>
+</body>
+</html>
